@@ -40,5 +40,12 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-  }
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "moduleResolution": "Node10",
+    "esModuleInterop": true,
+
+  },
+
+  "include": ["src"]
 }
