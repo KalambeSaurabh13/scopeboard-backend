@@ -3,18 +3,22 @@ import { Router } from "express";
 import {
   getEmployees,
   getEmployee,
-  getEmployeesByDept,
+  addEmployee,
+  editEmployee,
+  partiallyEditEmployee,
+  removeEmployee,
 } from "../controllers/employeeController.js";
 
 const router = Router();
 
-// Get employees by department
-router.get("/department/:department", getEmployeesByDept);
-
-// Get all employees
 router.get("/", getEmployees);
-
-// Get employee by ID
 router.get("/:id", getEmployee);
+
+router.post("/", addEmployee);
+
+router.put("/:id", editEmployee);
+router.patch("/:id", partiallyEditEmployee);
+
+router.delete("/:id", removeEmployee);
 
 export default router;
