@@ -1,4 +1,3 @@
-import type { Request, Response } from "express";
 
 import {
   getAllEmployees,
@@ -7,9 +6,12 @@ import {
   updateEmployee,
   patchEmployee,
   deleteEmployee,
+  getEmployeesByDepartment,
+  getEmployeesByMinSalaryAmount,
 } from "../utils/employeeUtils.js";
 
-const isValidEmployee = (body: any): boolean => {
+// Validate employee details
+const isValidEmployee = (body) => {
   return (
     typeof body.name === "string" &&
     body.name.trim().length > 0 &&
@@ -22,7 +24,7 @@ const isValidEmployee = (body: any): boolean => {
 };
 
 // GET all employees
-export const getEmployees = (req: Request, res: Response) => {
+export const getEmployees = (req, res) => {
   const employees = getAllEmployees();
 
   res.status(200).json({
@@ -33,7 +35,7 @@ export const getEmployees = (req: Request, res: Response) => {
 };
 
 // GET employee by ID
-export const getEmployee = (req: Request, res: Response) => {
+export const getEmployee = (req, res) => {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -61,7 +63,7 @@ export const getEmployee = (req: Request, res: Response) => {
 };
 
 // POST create employee
-export const addEmployee = (req: Request, res: Response) => {
+export const addEmployee = (req, res) => {
   if (!isValidEmployee(req.body)) {
     res.status(400).json({
       success: false,
@@ -80,7 +82,7 @@ export const addEmployee = (req: Request, res: Response) => {
 };
 
 // PUT update complete employee
-export const editEmployee = (req: Request, res: Response) => {
+export const editEmployee = (req, res) => {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -117,10 +119,7 @@ export const editEmployee = (req: Request, res: Response) => {
 };
 
 // PATCH update selected employee fields
-export const partiallyEditEmployee = (
-  req: Request,
-  res: Response
-) => {
+export const partiallyEditEmployee = (req, res) => {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -153,7 +152,8 @@ export const partiallyEditEmployee = (
     ("name" in body &&
       (typeof body.name !== "string" || !body.name.trim())) ||
     ("department" in body &&
-      (typeof body.department !== "string" || !body.department.trim())) ||
+      (typeof body.department !== "string" ||
+        !body.department.trim())) ||
     ("salary" in body &&
       (typeof body.salary !== "number" ||
         !Number.isFinite(body.salary) ||
@@ -184,7 +184,7 @@ export const partiallyEditEmployee = (
 };
 
 // DELETE employee
-export const removeEmployee = (req: Request, res: Response) => {
+export const removeEmployee = (req, res) => {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -208,5 +208,49 @@ export const removeEmployee = (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     message: "Employee deleted successfully",
+  });
+};
+
+// GET employees by department
+export const getEmployeeByDepartment = (req, res) => {
+  const department = req.params.department;
+
+  console.log("Department:", department);
+
+  if (!department) {
+    res.status(400).json({
+      success: false,
+      message: "Department parameter is required",
+    });
+    return;
+  }
+
+  const employees = getEmployeesByDepartment(department);
+
+  res.status(200).json({
+    success: true,
+    message: "Employees retrieved successfully",
+    data: employees,
+  });
+};
+
+// GET employees by minimum salary
+export const getEmployeeByMinSalaryAmount = (req, res) => {
+  const salaryAmount = Number(req.params.salaryAmount);
+
+  if (!Number.isFinite(salaryAmount) || salaryAmount < 0) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid salary amount",
+    });
+    return;
+  }
+
+  const employees = getEmployeesByMinSalaryAmount(salaryAmount);
+
+  res.status(200).json({
+    success: true,
+    message: "Employees retrieved successfully",
+    data: employees,
   });
 };

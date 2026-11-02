@@ -1,11 +1,5 @@
-export interface Employee {
-  id: number;
-  name: string;
-  department: string;
-  salary: number;
-}
 
-let employees: Employee[] = [
+let employees = [
   {
     id: 1,
     name: "Rahul",
@@ -26,29 +20,34 @@ let employees: Employee[] = [
   },
 ];
 
-export const getAllEmployees = (): Employee[] => {
+// Get all employees
+export const getAllEmployees = () => {
   return employees;
 };
 
-export const getEmployeeById = (
-  id: number
-): Employee | undefined => {
+// Get employee by ID
+export const getEmployeeById = (id) => {
   return employees.find((employee) => employee.id === id);
 };
 
-export const getEmployeesByDepartment = (
-  department: string
-): Employee[] => {
+// Get employees by department
+export const getEmployeesByDepartment = (department) => {
   return employees.filter(
     (employee) =>
       employee.department.toLowerCase() === department.toLowerCase()
   );
 };
 
-export const createEmployee = (
-  employeeData: Omit<Employee, "id">
-): Employee => {
-  const newEmployee: Employee = {
+// Get employees by minimum salary
+export const getEmployeesByMinSalaryAmount = (minSalary) => {
+  return employees.filter(
+    (employee) => employee.salary >= minSalary
+  );
+};
+
+// Create employee
+export const createEmployee = (employeeData) => {
+  const newEmployee = {
     id: employees.length
       ? Math.max(...employees.map((employee) => employee.id)) + 1
       : 1,
@@ -60,10 +59,8 @@ export const createEmployee = (
   return newEmployee;
 };
 
-export const updateEmployee = (
-  id: number,
-  employeeData: Omit<Employee, "id">
-): Employee | undefined => {
+// Update complete employee (PUT)
+export const updateEmployee = (id, employeeData) => {
   const index = employees.findIndex(
     (employee) => employee.id === id
   );
@@ -78,10 +75,8 @@ export const updateEmployee = (
   return employees[index];
 };
 
-export const patchEmployee = (
-  id: number,
-  employeeData: Partial<Omit<Employee, "id">>
-): Employee | undefined => {
+// Update selected employee fields (PATCH)
+export const patchEmployee = (id, employeeData) => {
   const index = employees.findIndex(
     (employee) => employee.id === id
   );
@@ -96,7 +91,8 @@ export const patchEmployee = (
   return employees[index];
 };
 
-export const deleteEmployee = (id: number): boolean => {
+// Delete employee
+export const deleteEmployee = (id) => {
   const initialLength = employees.length;
 
   employees = employees.filter(
