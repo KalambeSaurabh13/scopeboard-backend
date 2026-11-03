@@ -4,22 +4,22 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import employeeRoutes from "./routes/employeeRoutes.js";
+import requestLogger from "./middleware/requestLogger.js";
+import notFound from "./middleware/notFound.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 dotenv.config();
 
 const app = express();
 
-// 1. Middleware
+// 1. Built-in and third-party middleware
 app.use(cors());
 app.use(express.json());
 
-// 2. Request logger middleware
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-});
+// 2. Custom middleware
+app.use(requestLogger);
 
-// 3. Health check API
+// 3. Health check
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -27,10 +27,16 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// 4. Employee routes
+// 4. Application routes
 app.use("/api/employees", employeeRoutes);
 
-// 5. Start server
+// 5. Handle unknown routes
+app.use(notFound);
+
+// 6. Centralized error handler (always last)
+app.use(errorHandler);
+
+// 7. Start server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
