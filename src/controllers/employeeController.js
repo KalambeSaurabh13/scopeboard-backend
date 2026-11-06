@@ -5,12 +5,12 @@ import {
   editEmployee as editEmployeeService,
   partiallyEditEmployee as patchEmployeeService,
   removeEmployee as removeEmployeeService,
-  findEmployeesByDepartment,
-  findEmployeesByMinimumSalary
+  getEmployeesByDepartment,
+  getEmployeesByMinSalaryAmount
 } from "../services/employeeService.js";
 
-export const getEmployees = (req, res) => {
-  const employees = listEmployees();
+export const getEmployees = async (req, res) => {
+  const employees = await listEmployees();
 
   res.status(200).json({
     success: true,
@@ -18,9 +18,9 @@ export const getEmployees = (req, res) => {
   });
 };
 
-export const getEmployee = (req, res) => {
+export const getEmployee = async (req, res) => {
   const id = Number(req.params.id);
-  const employee = findEmployeeById(id);
+  const employee = await findEmployeeById(id);
 
   res.status(200).json({
     success: true,
@@ -28,8 +28,8 @@ export const getEmployee = (req, res) => {
   });
 };
 
-export const addEmployee = (req, res) => {
-  const employee = createEmployeeService(req.body);
+export const addEmployee = async (req, res) => {
+  const employee = await createEmployeeService(req.body);
 
   res.status(201).json({
     success: true,
@@ -38,9 +38,9 @@ export const addEmployee = (req, res) => {
   });
 };
 
-export const editEmployee = (req, res) => {
+export const editEmployee = async (req, res) => {
   const id = Number(req.params.id);
-  const employee = editEmployeeService(id, req.body);
+  const employee = await editEmployeeService(id, req.body);
 
   res.status(200).json({
     success: true,
@@ -48,9 +48,9 @@ export const editEmployee = (req, res) => {
   });
 };
 
-export const partiallyEditEmployee = (req, res) => {
+export const partiallyEditEmployee = async (req, res) => {
   const id = Number(req.params.id);
-  const employee = patchEmployeeService(id, req.body);
+  const employee = await patchEmployeeService(id, req.body);
 
   res.status(200).json({
     success: true,
@@ -58,15 +58,16 @@ export const partiallyEditEmployee = (req, res) => {
   });
 };
 
-export const removeEmployee = (req, res) => {
+export const removeEmployee = async (req, res) => {
   const id = Number(req.params.id);
-  removeEmployeeService(id);
+
+  await removeEmployeeService(id);
 
   res.status(204).end();
 };
 
-export const getEmployeeByDepartment = (req, res) => {
-  const employees = findEmployeesByDepartment(req.params.department);
+export const getEmployeeByDepartment = async (req, res) => {
+  const employees = await getEmployeesByDepartment(req.params.department);
 
   res.status(200).json({
     success: true,
@@ -74,9 +75,10 @@ export const getEmployeeByDepartment = (req, res) => {
   });
 };
 
-export const getEmployeeByMinSalaryAmount = (req, res) => {
-  const amount = Number(req.params.amount);
-  const employees = findEmployeesByMinimumSalary(amount);
+export const getEmployeeByMinSalaryAmount = async (req, res) => {
+  const minSalary = Number(req.params.amount);
+
+  const employees = await getEmployeesByMinSalaryAmount(minSalary);
 
   res.status(200).json({
     success: true,

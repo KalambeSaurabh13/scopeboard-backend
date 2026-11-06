@@ -1,13 +1,4 @@
-import {
-  getAllEmployees,
-  getEmployeeById,
-  createEmployee,
-  updateEmployee,
-  patchEmployee,
-  deleteEmployee,
-  getEmployeesByDepartment,
-  getEmployeesByMinSalaryAmount
-} from "../utils/employeeUtils.js";
+import * as employeeRepository from "../repositories/employeeRepository.js";
 
 const createError = (message, statusCode) => {
   const error = new Error(message);
@@ -15,12 +6,16 @@ const createError = (message, statusCode) => {
   return error;
 };
 
-export const listEmployees = () => {
-  return getAllEmployees();
+export const listEmployees = async () => {
+  return await employeeRepository.findAll();
 };
 
-export const findEmployeeById = (id) => {
-  const employee = getEmployeeById(id);
+export const findEmployeeById = async (id) => {
+  if (!Number.isInteger(id) || id <= 0) {
+    throw createError("Invalid employee ID", 400);
+  }
+
+  const employee = await employeeRepository.findById(id);
 
   if (!employee) {
     throw createError("Employee not found", 404);
@@ -29,48 +24,48 @@ export const findEmployeeById = (id) => {
   return employee;
 };
 
-export const addEmployee = (employeeData) => {
-  // Business rule: employee names must not be empty.
+export const addEmployee = async (employeeData) => {
   if (!employeeData.name?.trim()) {
     throw createError("Employee name is required", 400);
   }
 
-  // Business rule: salary cannot be negative.
+  if (!employeeData.department?.trim()) {
+    throw createError("Department is required", 400);
+  }
+
   if (
     typeof employeeData.salary !== "number" ||
     !Number.isFinite(employeeData.salary) ||
     employeeData.salary < 0
   ) {
-    throw createError("Salary must be a non-negative number", 400);
+    throw createError("Invalid salary", 400);
   }
 
-  return createEmployee(employeeData);
+  return await employeeRepository.create(employeeData);
 };
 
-export const editEmployee = (id, employeeData) => {
-  findEmployeeById(id);
+export const editEmployee = async (id, employeeData) => {
+  await findEmployeeById(id);
 
-  const updatedEmployee = updateEmployee(id, employeeData);
-
-  return updatedEmployee;
+  return await employeeRepository.update(id, employeeData);
 };
 
-export const partiallyEditEmployee = (id, employeeData) => {
-  findEmployeeById(id);
+export const partiallyEditEmployee = async (id, employeeData) => {
+  await findEmployeeById(id);
 
-  return patchEmployee(id, employeeData);
+  return await employeeRepository.patch(id, employeeData);
 };
 
-export const removeEmployee = (id) => {
-  findEmployeeById(id);
+export const removeEmployee = async (id) => {
+  await findEmployeeById(id);
 
-  return deleteEmployee(id);
+  return await employeeRepository.remove(id);
 };
 
-export const findEmployeesByDepartment = (department) => {
-  return getEmployeesByDepartment(department);
+export const getEmployeesByDepartment = async (department) => {
+  return employeeRepository.findByDepartment(department);
 };
 
-export const findEmployeesByMinimumSalary = (amount) => {
-  return getEmployeesByMinSalaryAmount(amount);
+export const getEmployeesByMinSalaryAmount = async (minSalary) => {
+  return employeeRepository.findByMinSalaryAmount(minSalary);
 };
