@@ -10,8 +10,13 @@ const createError = (message, statusCode) => {
   return error;
 };
 
-export const listEmployees = async () => {
-  return await employeeRepository.findAll();
+export const listEmployees = async (query = {}) => {
+    const employees = await employeeRepository.findAll(query);
+
+    return {
+        employees,
+        pagination: null
+    };
 };
 
 export const findEmployeeById = async (id) => {

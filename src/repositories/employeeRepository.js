@@ -48,19 +48,32 @@ export const createEmployee = async (employeeData) => {
 
 // Update complete employee
 export const update = async (id, employeeData) => {
-  const { name, department, salary } = employeeData;
+    const { name, department_id, salary } = employeeData;
 
-  const result = await pool.query(
-    `UPDATE employees
-     SET name = $1,
-         department = $2,
-         salary = $3
-     WHERE id = $4
-     RETURNING *`,
-    [name, department, salary, id]
-  );
+    const result = await pool.query(
+        `WITH updated AS (
+            UPDATE employees
+            SET
+                name = $1,
+                department_id = $2,
+                salary = $3
+            WHERE id = $4
+            RETURNING *
+        )
+        SELECT
+            e.id,
+            e.name,
+            e.department_id,
+            d.name AS department,
+            e.salary,
+            e.created_at
+        FROM updated e
+        LEFT JOIN departments d
+            ON e.department_id = d.id`,
+        [name, department_id, salary, id]
+    );
 
-  return result.rows[0] || null;
+    return result.rows[0];
 };
 
 // Partially update employee

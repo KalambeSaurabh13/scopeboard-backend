@@ -10,18 +10,21 @@ import {
 } from "../services/employeeService.js";
 
 
-export const getEmployees = async (req, res) => {
-  console.log("GET EMPLOYEES CONTROLLER CALLED");
+export const getEmployees = async (req, res, next) => {
+    try {
+        const result = await listEmployees(req.query);
 
-  const result = await listEmployees(req.query);
+        console.log("Full service result:", result);
+        console.log("Employees:", result.employees);
 
-  console.log("Full result:", result);
-
-  return res.status(200).json({
-    success: true,
-    data: result.employees,
-    pagination: result.pagination
-  });
+        return res.status(200).json({
+            success: true,
+            data: result.employees,
+            pagination: result.pagination
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 export const getEmployee = async (req, res) => {
   const id = Number(req.params.id);
