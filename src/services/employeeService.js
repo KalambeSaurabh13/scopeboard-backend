@@ -1,5 +1,9 @@
 import * as employeeRepository from "../repositories/employeeRepository.js";
 
+    import {
+    createEmployee
+} from "../repositories/employeeRepository.js";
+
 const createError = (message, statusCode) => {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -24,24 +28,37 @@ export const findEmployeeById = async (id) => {
   return employee;
 };
 
+
 export const addEmployee = async (employeeData) => {
-  if (!employeeData.name?.trim()) {
-    throw createError("Employee name is required", 400);
-  }
 
-  if (!employeeData.department?.trim()) {
-    throw createError("Department is required", 400);
-  }
+    if (
+        typeof employeeData.name !== "string" ||
+        !employeeData.name.trim()
+    ) {
+        throw createError("Employee name is required", 400);
+    }
 
-  if (
-    typeof employeeData.salary !== "number" ||
-    !Number.isFinite(employeeData.salary) ||
-    employeeData.salary < 0
-  ) {
-    throw createError("Invalid salary", 400);
-  }
+    const departmentId = Number(employeeData.department_id);
 
-  return await employeeRepository.create(employeeData);
+    if (!Number.isInteger(departmentId) || departmentId <= 0) {
+        throw createError("Valid department ID is required", 400);
+    }
+
+    if (
+        typeof employeeData.salary !== "number" ||
+        !Number.isFinite(employeeData.salary) ||
+        employeeData.salary < 0
+    ) {
+        throw createError("Invalid salary", 400);
+    }
+
+    const validatedEmployee = {
+        name: employeeData.name.trim(),
+        department_id: departmentId,
+        salary: employeeData.salary
+    };
+
+    return await createEmployee(validatedEmployee);
 };
 
 export const editEmployee = async (id, employeeData) => {

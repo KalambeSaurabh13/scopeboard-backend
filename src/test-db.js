@@ -16,14 +16,14 @@ const testDatabase = async () => {
 };
 
 testDatabase();
-const result = await pool.query(
-  "SELECT * FROM employees"
-);
+// const result = await pool.query(
+//   "SELECT * FROM employees"
+// );
 
 console.log(result.rows);
 
 
-// const result = await pool.query(
-// "UPDATE employees SET salary = 70000 WHERE id = 1 RETURNING *;"
-// );
-// console.log(result.rows);
+const result = await pool.query(
+"UPDATE employees SET salary = 70000 WHERE id = 1 RETURNING *;"
+);
+console.log(result.rows);

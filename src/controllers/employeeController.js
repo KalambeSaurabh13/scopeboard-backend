@@ -9,15 +9,20 @@ import {
   getEmployeesByMinSalaryAmount
 } from "../services/employeeService.js";
 
-export const getEmployees = async (req, res) => {
-  const employees = await listEmployees();
 
-  res.status(200).json({
+export const getEmployees = async (req, res) => {
+  console.log("GET EMPLOYEES CONTROLLER CALLED");
+
+  const result = await listEmployees(req.query);
+
+  console.log("Full result:", result);
+
+  return res.status(200).json({
     success: true,
-    data: employees
+    data: result.employees,
+    pagination: result.pagination
   });
 };
-
 export const getEmployee = async (req, res) => {
   const id = Number(req.params.id);
   const employee = await findEmployeeById(id);
@@ -28,16 +33,23 @@ export const getEmployee = async (req, res) => {
   });
 };
 
-export const addEmployee = async (req, res) => {
-  const employee = await createEmployeeService(req.body);
+export const addEmployee = async (req, res, next) => {
+    try {
+        console.log("Request body:", req.body);
+        console.log("Department ID:", req.body.department_id);
 
-  res.status(201).json({
-    success: true,
-    message: "Employee created successfully",
-    data: employee
-  });
+        const employee = await createEmployeeService(req.body);
+
+        res.status(201).json({
+            success: true,
+            message: "Employee created successfully",
+            data: employee
+        });
+
+    } catch (error) {
+        next(error);
+    }
 };
-
 export const editEmployee = async (req, res) => {
   const id = Number(req.params.id);
   const employee = await editEmployeeService(id, req.body);
